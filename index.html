@@ -1,98 +1,181 @@
 <!DOCTYPE html>
 <html>
-  <script src="playerjs.js" type="application/javascript"></script>
-  <script type="text/javascript">
-    window.flutterWebRenderer = "html";
-</script>
-
 <head>
+<title>Ansam</title>
+<style>
+  body {
+    /* Updated background color for a winter/Christmas feel */
+    background-color: #003366; /* Deep blue */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    font-family: sans-serif;
+    overflow: hidden; /* Hide scrollbars caused by snow */
+    position: relative; /* For the snowflakes to position correctly */
+  }
+  .heart-container {
+    position: relative;
+    width: 100px;
+    height: 90px;
+    animation: pulse 1.5s infinite alternate;
+    z-index: 5; /* Ensure heart is above snow */
+    /* Add cursor pointer to indicate it's clickable */
+    cursor: pointer;
+  }
+  .heart {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: #CC0000; /* Deeper Red */
+    transform: rotate(-45deg);
+  }
+  .heart::before,
+  .heart::after {
+    content: "";
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background-color: #CC0000;
+  }
+  .heart::before {
+    top: -50px;
+    left: 0;
+  }
+  .heart::after {
+    left: 50px;
+    top: 0;
+  }
+  .name {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 1.5em;
+    font-weight: bold;
+    z-index: 10;
+    text-align: center;
+    animation: bounce 1.5s infinite alternate;
+  }
+  /* --- CHRISTMAS HAT STYLES --- */
+  .santa-hat {
+    position: absolute;
+    top: -60px; /* Position above the heart */
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 15; /* Ensure hat is on top of everything */
+    /* Add a small rotation to the hat */
+    transform: translateX(-50%) rotate(-10deg);
+  }
 
-  <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
+  .hat-red {
+    width: 60px;
+    height: 60px;
+    background: red;
+    border-radius: 0 50px 0 0;
+    transform: skewY(-20deg);
+    position: relative;
+  }
 
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
+  .hat-fur {
+    position: absolute;
+    top: 55px;
+    left: -15px;
+    width: 90px;
+    height: 15px;
+    background: white;
+    border-radius: 50%;
+  }
 
-    For more details:
-    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+  .hat-pom {
+    position: absolute;
+    top: -15px;
+    right: -10px;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border-radius: 50%;
+  }
 
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
-  -->
-  <base href="/">
+  /* --- SNOWFLAKE STYLES --- */
+  .snowflake {
+    color: #fff;
+    font-size: 1em;
+    font-family: Arial, sans-serif;
+    text-shadow: 0 0 1px #000;
+    position: absolute;
+    top: -10px;
+    /* Animation properties for falling snow */
+    animation: fall linear infinite;
+  }
 
-  <meta charset="UTF-8">
-  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
-
-  <!-- iOS meta tags & icons -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="flutter_application_1">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
-
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
-
-  <title>flutter_application_1</title>
-  <link rel="manifest" href="manifest.json">
-
-  <script>
-    // The value below is injected by flutter build, do not touch.
-    var serviceWorkerVersion = '4124645606';
-  </script>
-  <!-- This script adds the flutter initialization JS code -->
-  <script src="flutter.js" defer></script>
+  @keyframes fall {
+    to {
+      transform: translateY(100vh);
+    }
+  }
+  /* --- KEYFRAMES --- */
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    100% { transform: scale(1.1); }
+  }
+  @keyframes bounce {
+    0% { transform: translate(-50%, -50%) translateY(0); }
+    100% { transform: translate(-50%, -50%) translateY(-5px); }
+  }
+</style>
 </head>
 <body>
 
-  <script>
-    let deferredPrompt;
+<div id="clickableHeart" class="heart-container">
+  <div class="santa-hat">
+    <div class="hat-red"></div>
+    <div class="hat-fur"></div>
+    <div class="hat-pom"></div>
+  </div>
+  <div class="heart"></div>
+  <div id="heartName" class="name">Gemini</div>
+</div>
 
-    window.addEventListener('beforeinstallprompt', (e) => {
-      deferredPrompt = e;
+<script>
+  // Assign the name first
+  document.getElementById('heartName').textContent = 'Ansam ✨';
+  
+  // --- CLICK HANDLER ---
+  // Wait until the element is present before trying to add the listener
+  const heartContainer = document.getElementById('clickableHeart');
+
+  if (heartContainer) {
+    heartContainer.addEventListener('click', function() {
+      alert('ميري كرسمس ماي سان 🐥.');
     });
+  }
 
-    function promptInstall(){
-       deferredPrompt.prompt();
-    }
+  // --- SNOWFLAKE JAVASCRIPT ---
+  const body = document.body;
+  const numSnowflakes = 50;
 
-    // Listen for app install event
-    window.addEventListener('appinstalled', () => {
-      deferredPrompt = null;
-      appInstalled();
-    });
+  for (let i = 0; i < numSnowflakes; i++) {
+    const snowflake = document.createElement('div');
+    snowflake.classList.add('snowflake');
+    snowflake.textContent = '❅'; // Snowflake character
 
-    // Track how PWA was launched (either from browser or as PWA)
-    function getLaunchMode() {
-      const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
-      if(deferredPrompt) hasPrompt();
-      if (document.referrer.startsWith('android-app://')) {
-        appLaunchedAsTWA();
-      } else if (navigator.standalone || isStandalone) {
-        appLaunchedAsPWA();
-      } else {
-        window.appLaunchedInBrowser();
-      }
-    }
+    // Randomize initial position, size, and duration
+    const size = Math.random() * 0.5 + 0.5; // 0.5 to 1.0
+    const duration = Math.random() * 10 + 5; // 5s to 15s
+
+    snowflake.style.left = `${Math.random() * 100}vw`;
+    snowflake.style.fontSize = `${size}em`;
+    snowflake.style.animationDuration = `${duration}s`;
+    snowflake.style.opacity = size; // Smaller snowflakes are less visible
+    snowflake.style.animationDelay = `-${Math.random() * duration}s`; // Start at different points
+
+    body.appendChild(snowflake);
+  }
 </script>
 
-
-  <script>
-    window.addEventListener('load', function(ev) {
-      // Download main.dart.js
-      _flutter.loader.loadEntrypoint({
-        serviceWorker: {
-          serviceWorkerVersion: serviceWorkerVersion,
-        },
-        onEntrypointLoaded: function(engineInitializer) {
-          engineInitializer.initializeEngine().then(function(appRunner) {
-            appRunner.runApp();
-          });
-        }
-      });
-    });
-  </script>
 </body>
 </html>
