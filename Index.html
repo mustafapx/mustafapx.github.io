@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday Sarah</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Special+Elite&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0; padding: 0;
+            background-color: #f0f9ff;
+            color: #0c4a6e;
+            font-family: 'Special Elite', cursive;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            border: 6px double #bae6fd;
+            padding: 60px 40px;
+            background: #ffffff;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            position: relative;
+            animation: fadeIn 1.5s ease-out;
+            border-radius: 4px;
+            z-index: 2;
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 3rem;
+            color: #0284c7;
+            margin-bottom: 10px;
+        }
+
+        .clickable-name {
+            cursor: pointer;
+            display: inline-block;
+            transition: all 0.3s ease;
+            user-select: none;
+            position: relative;
+        }
+
+        .name-pop {
+            animation: popAnimation 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popAnimation {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.4); color: #0ea5e9; text-shadow: 0 0 15px rgba(14, 165, 233, 0.4); }
+            100% { transform: scale(1); }
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            letter-spacing: 4px;
+            border-bottom: 3px solid #e0f2fe;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            color: #38bdf8;
+            font-weight: bold;
+        }
+
+        .message { font-size: 1.5rem; line-height: 1.6; margin: 30px 0; color: #334155; }
+        
+        .flying-icon {
+            position: fixed;
+            font-size: 2rem;
+            pointer-events: none;
+            z-index: 10;
+            opacity: 0;
+        }
+
+        @keyframes flyAcross {
+            0% { transform: translate(-10vw, 100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translate(110vw, -10vh) rotate(360deg); opacity: 0; }
+        }
+
+        .confetti {
+            position: absolute;
+            width: 8px; height: 8px;
+            z-index: 5; top: -10px;
+            pointer-events: none;
+        }
+
+        @keyframes fall {
+            to { transform: translateY(110vh) rotate(720deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.98); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="subtitle">SHINZOU WO SASAGEYO!</div>
+        <h1>HAPPY BIRTHDAY, <span id="sarah-name" class="clickable-name">⚔️SARAH⚔️</span></h1>
+        <div class="message">
+            <br>
+            May your year ahead be free of walls <br>
+        </div>
+        <p>Dedicate your heart to having a great خفارات 🗿</p>
+    </div>
+
+    <script>
+        const nameEl = document.getElementById('sarah-name');
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        // Procedural Magical Chime Sound
+        function playChimeSound() {
+            const now = audioCtx.currentTime;
+            
+            // Create a cluster of notes for a "shimmer" effect
+            [880, 1320, 1760].forEach((freq, index) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, now + (index * 0.05));
+                
+                gain.gain.setValueAtTime(0, now);
+                gain.gain.linearRampToValueAtTime(0.1, now + (index * 0.05) + 0.01);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+                
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                osc.start(now + (index * 0.05));
+                osc.stop(now + 1.5);
+            });
+        }
+
+        function createConfetti(amount = 40) {
+            const colors = ['#0284c7', '#38bdf8', '#bae6fd', '#ffffff'];
+            for (let i = 0; i < amount; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animation = `fall ${(Math.random() * 2 + 2)}s linear forwards`;
+                document.body.appendChild(confetti);
+                setTimeout(() => confetti.remove(), 4000);
+            }
+        }
+
+        function spawnFlyingIcons() {
+            const icons = ["⚔️", "✨", "💙"];
+            for(let i=0; i<4; i++) {
+                const icon = document.createElement('div');
+                icon.innerHTML = icons[Math.floor(Math.random() * icons.length)];
+                icon.className = "flying-icon";
+                icon.style.left = (Math.random() * 20) + "vw";
+                icon.style.animation = `flyAcross ${1.5 + Math.random()}s ease-out forwards`;
+                document.body.appendChild(icon);
+                setTimeout(() => icon.remove(), 2000);
+            }
+        }
+
+        nameEl.addEventListener('click', () => {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            
+            playChimeSound();
+            spawnFlyingIcons();
+            createConfetti(30);
+
+            nameEl.classList.remove('name-pop');
+            void nameEl.offsetWidth; 
+            nameEl.classList.add('name-pop');
+        });
+
+        window.onload = () => createConfetti(50);
+    </script>
+</body>
+</html>
