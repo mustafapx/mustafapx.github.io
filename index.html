@@ -6,35 +6,128 @@
     <title>Happy Birthday Sarah</title>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Special+Elite&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --bg-color: #f0f9ff;
+            --text-color: #0c4a6e;
+            --border-color: #bae6fd;
+            --highlight-color: #0284c7;
+            --accent-color: #38bdf8;
+            --card-bg: #ffffff;
+            --env-bg: #e0f2fe;
+            --env-flap: #bae6fd;
+            --env-shadow: rgba(12, 74, 110, 0.15);
+        }
+
         body {
             margin: 0; padding: 0;
-            background-color: #f0f9ff;
-            color: #0c4a6e;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             font-family: 'Special Elite', cursive;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
             overflow: hidden;
+            perspective: 1000px;
         }
 
-        .container {
+        /* --- Envelope Styles --- */
+        #envelope-wrapper {
+            position: relative;
+            width: 300px;
+            height: 200px;
+            background-color: var(--env-bg);
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 10px 30px var(--env-shadow);
+            cursor: pointer;
+            z-index: 50;
+            transition: transform 0.4s ease, opacity 0.5s ease;
+            transform-style: preserve-3d;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        #envelope-flap {
+            position: absolute;
+            top: 0; left: 0;
+            width: 0; height: 0;
+            border-left: 150px solid transparent;
+            border-right: 150px solid transparent;
+            border-top: 110px solid var(--env-flap);
+            transform-origin: top;
+            transition: transform 0.6s ease-in-out;
+            z-index: 52;
+        }
+
+        .envelope-front {
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 100%; height: 110px;
+            background-color: var(--env-bg);
+            border-radius: 0 0 8px 8px;
+            z-index: 53;
+            border-top: 1px solid rgba(255,255,255,0.5);
+        }
+
+        #envelope-text {
+            position: absolute;
+            top: 60%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Cinzel', serif;
+            color: var(--highlight-color);
             text-align: center;
-            border: 6px double #bae6fd;
+            font-size: 1.1rem;
+            width: 100%;
+            z-index: 54;
+            pointer-events: none;
+        }
+
+        /* --- Open State --- */
+        #envelope-wrapper.open {
+            animation: none;
+            transform: translateY(100px) rotateX(-20deg);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #envelope-wrapper.open #envelope-flap {
+            transform: rotateX(180deg);
+        }
+
+        /* --- Birthday Card Styles --- */
+        #card-container {
+            text-align: center;
+            border: 6px double var(--border-color);
             padding: 60px 40px;
-            background: #ffffff;
+            background: var(--card-bg);
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
             max-width: 600px;
+            width: 90%;
             position: relative;
-            animation: fadeIn 1.5s ease-out;
             border-radius: 4px;
             z-index: 2;
+            display: none; /* Hidden by default */
+        }
+
+        #card-container.reveal {
+            display: block;
+            animation: revealCard 1.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes revealCard {
+            0% { opacity: 0; transform: translateY(50px) scale(0.9); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
         }
 
         h1 {
             font-family: 'Cinzel', serif;
-            font-size: 3rem;
-            color: #0284c7;
+            font-size: clamp(1.8rem, 8vw, 3rem);
+            color: var(--highlight-color);
             margin-bottom: 10px;
         }
 
@@ -43,7 +136,6 @@
             display: inline-block;
             transition: all 0.3s ease;
             user-select: none;
-            position: relative;
         }
 
         .name-pop {
@@ -57,22 +149,23 @@
         }
 
         .subtitle {
-            font-size: 1.2rem;
-            letter-spacing: 4px;
+            font-size: 1.1rem;
+            letter-spacing: 3px;
             border-bottom: 3px solid #e0f2fe;
             padding-bottom: 10px;
             margin-bottom: 20px;
-            color: #38bdf8;
+            color: var(--accent-color);
             font-weight: bold;
         }
 
-        .message { font-size: 1.5rem; line-height: 1.6; margin: 30px 0; color: #334155; }
+        .message { font-size: 1.3rem; line-height: 1.6; margin: 30px 0; color: #334155; }
         
+        /* Effects */
         .flying-icon {
             position: fixed;
             font-size: 2rem;
             pointer-events: none;
-            z-index: 10;
+            z-index: 100;
             opacity: 0;
         }
 
@@ -84,22 +177,29 @@
         .confetti {
             position: absolute;
             width: 8px; height: 8px;
-            z-index: 5; top: -10px;
+            z-index: 100;
+            top: -10px;
             pointer-events: none;
         }
 
         @keyframes fall {
             to { transform: translateY(110vh) rotate(720deg); }
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.98); }
-            to { opacity: 1; transform: scale(1); }
-        }
     </style>
 </head>
 <body>
-    <div class="container">
+
+    <div id="envelope-wrapper">
+        <div id="envelope-flap"></div>
+        <div class="envelope-front"></div>
+        <div id="envelope-text">
+            FOR<br>
+            <span style="font-size: 1.4rem; font-weight: bold;">⚔️SARAH⚔️</span><br>
+            <small style="opacity: 0.7;">(Click to Open)</small>
+        </div>
+    </div>
+
+    <div id="card-container">
         <div class="subtitle">SHINZOU WO SASAGEYO!</div>
         <h1>HAPPY BIRTHDAY, <span id="sarah-name" class="clickable-name">⚔️SARAH⚔️</span></h1>
         <div class="message">
@@ -110,34 +210,63 @@
     </div>
 
     <script>
+        const envelope = document.getElementById('envelope-wrapper');
+        const card = document.getElementById('card-container');
         const nameEl = document.getElementById('sarah-name');
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        let audioCtx;
 
-        // Procedural Magical Chime Sound
-        function playChimeSound() {
-            const now = audioCtx.currentTime;
+        // --- ENVELOPE CLICK ---
+        envelope.addEventListener('click', function() {
+            // Initialize audio context on first click
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+
+            // Start animation
+            envelope.classList.add('open');
+
+            // Wait for flap to open, then swap elements
+            setTimeout(() => {
+                envelope.style.display = 'none';
+                card.classList.add('reveal');
+                
+                // Big celebration burst
+                createConfetti(70);
+            }, 600);
+        });
+
+        // --- NAME CLICK ---
+        nameEl.addEventListener('click', () => {
+            playChimeSound();
+            spawnFlyingIcons();
+            createConfetti(30);
             
-            // Create a cluster of notes for a "shimmer" effect
+            nameEl.classList.remove('name-pop');
+            void nameEl.offsetWidth; 
+            nameEl.classList.add('name-pop');
+        });
+
+        // --- SOUND LOGIC ---
+        function playChimeSound() {
+            if (!audioCtx) return;
+            const now = audioCtx.currentTime;
             [880, 1320, 1760].forEach((freq, index) => {
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
-                
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(freq, now + (index * 0.05));
-                
                 gain.gain.setValueAtTime(0, now);
                 gain.gain.linearRampToValueAtTime(0.1, now + (index * 0.05) + 0.01);
                 gain.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
-                
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
-                
                 osc.start(now + (index * 0.05));
                 osc.stop(now + 1.5);
             });
         }
 
-        function createConfetti(amount = 40) {
+        // --- VISUAL EFFECTS ---
+        function createConfetti(amount) {
             const colors = ['#0284c7', '#38bdf8', '#bae6fd', '#ffffff'];
             for (let i = 0; i < amount; i++) {
                 const confetti = document.createElement('div');
@@ -152,30 +281,19 @@
 
         function spawnFlyingIcons() {
             const icons = ["⚔️", "✨", "💙"];
-            for(let i=0; i<4; i++) {
+            for(let i=0; i<5; i++) {
                 const icon = document.createElement('div');
                 icon.innerHTML = icons[Math.floor(Math.random() * icons.length)];
                 icon.className = "flying-icon";
-                icon.style.left = (Math.random() * 20) + "vw";
+                icon.style.left = (Math.random() * 40 + 30) + "vw"; 
                 icon.style.animation = `flyAcross ${1.5 + Math.random()}s ease-out forwards`;
                 document.body.appendChild(icon);
                 setTimeout(() => icon.remove(), 2000);
             }
         }
 
-        nameEl.addEventListener('click', () => {
-            if (audioCtx.state === 'suspended') audioCtx.resume();
-            
-            playChimeSound();
-            spawnFlyingIcons();
-            createConfetti(30);
-
-            nameEl.classList.remove('name-pop');
-            void nameEl.offsetWidth; 
-            nameEl.classList.add('name-pop');
-        });
-
-        window.onload = () => createConfetti(50);
+        // Ambient confetti on load
+        window.onload = () => createConfetti(15);
     </script>
 </body>
 </html>
